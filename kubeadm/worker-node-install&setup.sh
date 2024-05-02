@@ -6,7 +6,7 @@ Create Security Group and open required ports for kubernetes.
 
 #1) SSH into the sever and Assign hostname & login as ‘root’ user because the following set of commands need to be executed with ‘sudo’ permissions.
 
-sudo hostnamectl set-hostname master
+sudo hostnamectl set-hostname node1
 sudo -i 
 
 --------------------------------------------------
