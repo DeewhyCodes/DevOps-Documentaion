@@ -132,5 +132,28 @@ spec:
       - name: my-container
         image: my-image
 
+--To pull from a private repository:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: my-container
+    image: <registry>/<image>:<tag>
+  imagePullSecrets:
+  - name: my-dockerhub-secret
+
+--To create a generic secret file
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-secret
+type: Opaque
+data:
+  username: YWRtaW4=    # Base64-encoded value
+  password: cGFzc3dvcmQ=   # Base64-encoded value
+
+
 To apply these manifest files, use the following command:
 kubectl apply -f <manifest_file>.yaml
