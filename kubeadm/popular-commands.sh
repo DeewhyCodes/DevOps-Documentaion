@@ -16,6 +16,7 @@ kubectl describe  svc/ep/namespace/pods/rc: this shows full information of any o
 kubectl describe  svc/ep/namespace/pods/rc -ns(wherever applicable)/svc(wherever applicable)/po(where applicable) nameofOption: this lists information about the specified option.
 kubectl config set-context --current --namespace=my-namespace: this sets the default namespace to the one specified
 kubectl scale rc rcname --replicas=4: this updates the number of replicas to be created by the rc
+kubectl get all -o wide -n namespace: gets all services in the specified namesapce
 
 
 
