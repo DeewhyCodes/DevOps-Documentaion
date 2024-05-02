@@ -17,6 +17,12 @@ kubectl describe  svc/ep/namespace/pods/rc -ns(wherever applicable)/svc(wherever
 kubectl config set-context --current --namespace=my-namespace: this sets the default namespace to the one specified
 kubectl scale rc rcname --replicas=4: this updates the number of replicas to be created by the rc
 kubectl get all -o wide -n namespace: gets all services in the specified namesapce
+kubectl create secret docker-registry my-dockerhub-secret \
+--docker-server=<registry> \
+--docker-username=<username> \
+--docker-password=<password>  : to create a secret for docker private repo
+kubectl create secret generic my-secret --from-literal=username=myusername --from-literal=password=mypassword  :to create a generic secret credentials
+
 
 
 
