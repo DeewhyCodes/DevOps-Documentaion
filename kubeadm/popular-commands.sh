@@ -11,10 +11,11 @@ kubeadm token list: This lists all the tokens and their validity
 kubectl run nginx-demo --image=nginx --port=80: This command runs a new pod with the nginx image and exposes port 80.
 kubectl expose pod nginx-demo --port=80 --target-port=80 --type=NodePort: This command exposes the nginx-demo pod as a NodePort service.
 kubectl get services: This command lists the services in the default namespace.
-kubectl get svc/ep/namespace/pods -o wide: this lists any of the options with more deatils about them.
-kubectl describe  svc/ep/namespace/pods: this shows full information of any of the specified option
-kubectl describe  svc/ep/namespace/pods -ns(wherever applicable)/svc(wherever applicable)/po(where applicable) nameofOption: this lists information about the specified option.
+kubectl get svc/ep/namespace/pods/rc -o wide: this lists any of the options with more deatils about them.
+kubectl describe  svc/ep/namespace/pods/rc: this shows full information of any of the specified option
+kubectl describe  svc/ep/namespace/pods/rc -ns(wherever applicable)/svc(wherever applicable)/po(where applicable) nameofOption: this lists information about the specified option.
 kubectl config set-context --current --namespace=my-namespace: this sets the default namespace to the one specified
+kubectl scale rc rcname --replicas=4: this updates the number of replicas to be created by the rc
 
 
 
