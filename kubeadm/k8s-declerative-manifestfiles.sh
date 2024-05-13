@@ -155,5 +155,90 @@ data:
   password: cGFzc3dvcmQ=   # Base64-encoded value
 
 
+Deploment Strategies
+#Recreate strategy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 4
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: mylandmarktech/hello:1    
+        ports:
+        - containerPort: 80
+---
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: appsvc
+spec:
+  selector:
+    app: myapp
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 31400 #[30000-32676]
+--------------------------------------------------
+kind: Service
+apiVersion: v1
+metadata:
+  name: appsvc
+spec:
+  selector:
+    app: myapp
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 31400 #[30000-32676]
+
+RollingUpdates strategy:   no downtime 
+# Deployment RollingUpdate
+---------------------
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+       maxSurge: 1
+       maxUnavailable: 1
+  minReadySeconds: 30   
+  selector:
+    matchLabels:
+      app: myapp 
+  template:
+    metadata:
+      name: hello
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: helloworld
+        image: mylandmarktech/hello:1
+        ports:
+        - containerPort: 80
+
+
 To apply these manifest files, use the following command:
 kubectl apply -f <manifest_file>.yaml
