@@ -5,7 +5,10 @@
 
 #3) resource block, to create the instance
 resource "aws_instance" "test_ec2" {
+  #ami = data.aws_ami.ubuntu_ami.id #Calling ami ID from data source file
+
   ami           = var.my_ami #call the ami variable
+
   instance_type = var.my_instance_type[0] #call the instance_type variable t2.micro by its index (0)
   #instance_type = var.my_instance_type["dev"] #to call the instance_type from a map variable.
 
