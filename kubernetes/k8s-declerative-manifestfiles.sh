@@ -239,6 +239,5 @@ spec:
         ports:
         - containerPort: 80
 
-
 To apply these manifest files, use the following command:
 kubectl apply -f <manifest_file>.yaml
