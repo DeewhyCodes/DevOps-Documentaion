@@ -1,0 +1,220 @@
+# Complete Manifest Where in single yml we defined Deployment & Service for SpringApp & PVC(with default  StorageClass),ReplicaSet & Service For Mongo.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springapp
+  template:
+    metadata:
+      name: springapppod
+      labels:
+        app: springapp
+    spec:
+      containers:
+      - name: springappcontainer
+        image: mylandmarktech/spring-boot-mongo
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGO_DB_USERNAME
+          value: devdb
+        - name: MONGO_DB_PASSWORD
+          value: devdb@123
+        - name: MONGO_DB_HOSTNAME
+          value: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springapp
+spec:
+  selector:
+    app: springapp
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: ClusterIP #Changed from load balancer to ClusterIP, this will delete the loadbalancer created in aws when applied.
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodbpvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mongodbrs
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      name: mongodbpod
+      labels:
+        app: mongodb
+    spec:
+      volumes:
+      - name: pvc
+        persistentVolumeClaim:
+          claimName: mongodbpvc
+      containers:
+      - name: mongodbcontainer
+        image: mongo
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: devdb
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: devdb@123
+        volumeMounts:
+        - name: pvc
+          mountPath: /data/db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  type: ClusterIP
+  selector:
+    app: mongodb
+  ports:
+  - port: 27017
+    targetPort: 27017
+
+#we can run (kubectl edit svc springapp) then change tthe service type, or apply the yaml file
+
+---
+javawebapp.yml
+=============
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  labels:
+    name: javawebappsvc
+  name: java-controller
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: javawebappsvc
+    spec:
+      containers:
+      - image: mylandmarktech/java-web-app
+        name: javawebappsvc
+        ports:
+        - name: javawebappsvc
+          containerPort: 8080  
+---
+# Node Port Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: javawebappsvc
+  name: javawebappsvc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    name: javawebappsvc
+
+#we can create a-records for our applications and define the DNS in the paths or hostname
+
+app domain name = mywebapp.net
+springapp a-record = springapp.mywebapp.net
+java-web-app  a-record = web.mywebapp.net
+---
+#SINGLE HOST/PATHS DNS
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apps-ingress-rule
+  namespace: dev
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: springapp.mywebapp.net
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/" #the application is available in the root 
+            backend:
+              service:
+                name: springappsvc
+                port:
+                  number: 80
+#to access (springapp.mywebapp.net)
+---
+#MULTIPLE DNS WITH HOSTS
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apps-ingress-rule
+  namespace: dev
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: springapp.mywebapp.net
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: springappsvc
+                port:
+                  number: 80
+    - host: web.mywebapp.net
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/java-web-app"
+            backend:
+              service:
+                name: javawebappsvc
+                port:
+                  number: 80
+#to access (web.mywebapp.net/java-web-app)
+---
+#PATH BASED ROUTING
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apps-ingress-rule
+  namespace: dev
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: mywebapp.net
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/" #once mywebapp.net is visited, traffic would be routed here because this is the root application
+            backend:
+              service:
+                name: springappsvc #Routes traffic to the service
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: "/java-web-app"
+            backend:
+              service:
+                name: javawebappsvc #Routes traffic to the service
+                port:
+                  number: 80

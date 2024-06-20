@@ -248,22 +248,22 @@ Ansible playbooks: are YAML files that define a set of tasks to be executed on a
     
     ansible-vault decrypt /etc/ansible/group_vars/all.yml --vault-password=vaultpass
     
-    How can specific tasks be runned in a playbooks?
-1. ansible-playbook apache.yml  --step
-2. assign tags to tasks 
-
-ansible-playbook pb.yml  --skip-tags 'install,start'
-ansible-playbook pb.yml --tags 'install'
-ansible-playbook pb.yml --tags 'copy'
-
-ansible-playbook apache.yml  --syntax-check
-what is dry run in ansible?
-ansible-playbook apache.yml  --check  =# dry run
-ansible-playbook apache.yml  --step
-ansible-playbook apache.yml  --list-hosts
-
-
-What is verbose mode in ansible? -v -vv -vvv
-ansible-playbook apache.yml -v 
-ansible k8s -a "kubectl get ns" -v=7 
-kubectl create ns dev -v=7 
+  How can specific tasks be runned in a playbooks?
+    1. ansible-playbook apache.yml  --step
+    2. assign tags to tasks 
+    
+    ansible-playbook pb.yml  --skip-tags 'install,start'
+    ansible-playbook pb.yml --tags 'install'
+    ansible-playbook pb.yml --tags 'copy'
+    
+    ansible-playbook apache.yml  --syntax-check
+    what is dry run in ansible?
+    ansible-playbook apache.yml  --check  =# dry run
+    ansible-playbook apache.yml  --step
+    ansible-playbook apache.yml  --list-hosts
+    
+    
+    What is verbose mode in ansible? -v -vv -vvv
+    ansible-playbook apache.yml -v 
+    ansible k8s -a "kubectl get ns" -v=7 
+    kubectl create ns dev -v=7 2
